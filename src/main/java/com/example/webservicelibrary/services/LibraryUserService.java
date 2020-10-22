@@ -9,6 +9,7 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -38,7 +39,7 @@ public class LibraryUserService {
     }
 
     @CachePut(value = "libraryCache", key = "#result.id")
-    public LibraryUser saveUser(LibraryUser user) {
+    public LibraryUser saveUser(@Validated LibraryUser user) {
         return userRepository.save(user);
     }
 
