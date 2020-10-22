@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,7 +31,7 @@ public class LibraryUserController {
     }
 
     @PostMapping
-    public ResponseEntity<LibraryUser> saveLibraryUser(@RequestBody LibraryUser user) {
+    public ResponseEntity<LibraryUser> saveLibraryUser(@Validated @RequestBody LibraryUser user) {
         return ResponseEntity.ok(userService.saveUser(user));
     }
 

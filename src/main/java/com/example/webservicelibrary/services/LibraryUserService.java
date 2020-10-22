@@ -39,7 +39,7 @@ public class LibraryUserService {
     }
 
     @CachePut(value = "libraryCache", key = "#result.id")
-    public LibraryUser saveUser(@Validated LibraryUser user) {
+    public LibraryUser saveUser(LibraryUser user) {
         return userRepository.save(user);
     }
 
