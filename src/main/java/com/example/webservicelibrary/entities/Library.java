@@ -1,4 +1,4 @@
-package com.example.webservicelibrary.enteties;
+package com.example.webservicelibrary.entities;
 
 import lombok.Builder;
 import lombok.Data;

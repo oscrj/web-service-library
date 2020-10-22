@@ -1,6 +1,6 @@
 package com.example.webservicelibrary.repositories;
 
-import com.example.webservicelibrary.enteties.LibraryUser;
+import com.example.webservicelibrary.entities.LibraryUser;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,6 +1,6 @@
 package com.example.webservicelibrary.controllers;
 
-import com.example.webservicelibrary.enteties.LibraryUser;
+import com.example.webservicelibrary.entities.LibraryUser;
 import com.example.webservicelibrary.services.LibraryUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
