@@ -22,9 +22,9 @@ public class LibraryUser implements Serializable {
     @NotEmpty(message = "Firstname can't be empty")
     @Size(min = 2, max = 10)
     private String firstname;
-    @NotEmpty(message = "Firstname can't be empty")
+    @NotEmpty(message = "Lastname can't be empty")
     @Size(min = 2, max = 15)
-    private String lastName;
+    private String lastname;
     @Past
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING)
