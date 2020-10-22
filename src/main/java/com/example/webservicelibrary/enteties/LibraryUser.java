@@ -5,11 +5,15 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 
+import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Builder
-public class LibraryUser {
+public class LibraryUser implements Serializable {
+
+    private static final long serialVersionUID = -846068740697687411L;
     @Id
     private String id;
     private String firstname;
@@ -22,6 +26,6 @@ public class LibraryUser {
     private String username;
     private String password;
     private boolean admin;
+    private List<Book> borrowedBook;
 
-    // private List<Book> borrowedBooks = new
 }
