@@ -38,7 +38,8 @@ public class LibraryUser implements Serializable {
     @Indexed(unique = true)
     @Size(min = 2, max = 10, message = "Username invalid")
     private String username;
-    @NotBlank(message = "Username must contain a value")
+    @NotBlank(message = "Password must contain a value")
     private String password;
+    private List<String> acl;
     private List<Book> borrowedBooks;
 }
