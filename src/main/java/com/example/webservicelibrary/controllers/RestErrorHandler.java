@@ -18,7 +18,6 @@ public class RestErrorHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
                                                                   HttpHeaders headers, HttpStatus status,
                                                                   WebRequest request) {
-
         var entityValidationError =  ex.getBindingResult().getFieldErrors().stream()
                 .map(fieldError -> EntityValidationError.builder()
                         .field(fieldError.getField())
@@ -28,20 +27,4 @@ public class RestErrorHandler extends ResponseEntityExceptionHandler {
                 .collect(Collectors.toList());
         return ResponseEntity.status(status).headers(headers).body(entityValidationError);
     }
-
-    /*
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<List<String>> handleValidationErrors(ConstraintViolationException ex) {
-        var errors = new ArrayList<String>(ex.getConstraintViolations().size());
-        ex.getConstraintViolations().forEach(constraintViolation -> {
-            errors.add(constraintViolation.getPropertyPath() + " : " + constraintViolation.getMessage());
-        });
-        return ResponseEntity.badRequest().body(errors);
-    }
-
-    @ExceptionHandler(BindException.class)
-    public ResponseEntity<List<ObjectError>> handleValidationErrors(BindException ex) {
-        return ResponseEntity.badRequest().body(ex.getAllErrors());
-    }
-    */
 }

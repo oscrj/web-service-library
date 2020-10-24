@@ -8,6 +8,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -39,6 +40,12 @@ public class LibraryUserService {
                         String.format("User with this id %s. , could not be found", id)));
     }
 
+    public LibraryUser findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        String.format("User with this username %s. , could not be found", username)));
+    }
+
     //@CachePut(value = "libraryCache", key = "#result.id")
     public LibraryUser saveUser(LibraryUser user) {
         user.setPassword(passwordEncoder.encode(user.getPassword())); // Encrypt users password.
@@ -47,6 +54,18 @@ public class LibraryUserService {
 
     //@CachePut(value = "libraryCache", key = "#id")
     public void updateUser(String id, LibraryUser user) {
+
+        // check if current logged in user is ADMIN.
+        var isAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().toUpperCase().equals("ROLE_ADMIN"));
+        // check if logged in user is the user that will be updated.
+        var isCurrentUser = SecurityContextHolder.getContext().getAuthentication().getName().toLowerCase()
+                .equals(user.getUsername().toLowerCase());
+
+        if (!isAdmin && !isCurrentUser) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You can only update your own details.");
+        }
+
         if(!userRepository.existsById(id)){
             log.error(String.format("User with this id %s. , could not be found", id));
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
