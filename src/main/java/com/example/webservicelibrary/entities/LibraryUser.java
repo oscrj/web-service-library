@@ -40,6 +40,5 @@ public class LibraryUser implements Serializable {
     private String username;
     @NotBlank(message = "Username must contain a value")
     private String password;
-    private boolean isAdmin;
     private List<Book> borrowedBooks;
 }
