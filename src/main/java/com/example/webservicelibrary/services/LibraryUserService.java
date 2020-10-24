@@ -58,7 +58,7 @@ public class LibraryUserService {
         userRepository.save(user);
     }
 
-    //@CacheEvict(value = "libraryCache")
+    //@CacheEvict(value = "libraryCache", key = "#id")
     public void deleteUser(String id) {
         if(!userRepository.existsById(id)) {
             log.error(String.format("User with this id %s. , could not be found", id));
