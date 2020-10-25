@@ -1,9 +1,7 @@
 package com.example.webservicelibrary.controllers;
 
 import com.example.webservicelibrary.entities.Book;
-import com.example.webservicelibrary.entities.LibraryUser;
-import com.example.webservicelibrary.services.BookService;
-import com.example.webservicelibrary.services.LibraryUserService;
+import com.example.webservicelibrary.services.LibraryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,15 +17,12 @@ import java.util.List;
 @Slf4j
 public class LibraryController {
     @Autowired
-    private LibraryUserService userService;
-    @Autowired
-    private BookService bookService;
+    private LibraryService libraryService;
 
     @GetMapping
-    public ResponseEntity<List<Book>> findAllBooks(@RequestParam(required = false) String title,
+    public ResponseEntity<List<Object>> findAll(@RequestParam(required = false) String title,
                                                    @RequestParam(required = false) boolean sortOnPublishedDate) {
-
-        return ResponseEntity.ok(bookService.findAllBooks(title, sortOnPublishedDate));
+        return ResponseEntity.ok(libraryService.findAll(title, sortOnPublishedDate));
     }
 
 }
