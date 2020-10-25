@@ -20,19 +20,20 @@ public class LibraryController {
 
     @GetMapping
     public ResponseEntity<List<Object>> findAll(@RequestParam(required = false) String title,
-                                                   @RequestParam(required = false) boolean sortOnPublishedDate) {
-        return ResponseEntity.ok(libraryService.findAll(title, sortOnPublishedDate));
+                                                   @RequestParam(required = false) boolean sortOnPublishedYear,
+                                                @RequestParam(required = false) boolean sortOnRating) {
+        return ResponseEntity.ok(libraryService.findAll(title, sortOnPublishedYear, sortOnRating));
     }
 
     @Secured({"ROLE_USER","ROLE_LIBRARIAN","ROLE_ADMIN"})
-    @PutMapping("/library/borrow/{id}")
+    @PostMapping("/borrow/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void borrow(@PathVariable String id, @RequestBody Book book){
         libraryService.borrowBook(id, book);
     }
 
     @Secured({"ROLE_USER","ROLE_LIBRARIAN","ROLE_ADMIN"})
-    @PutMapping("/library/return/{id}")
+    @PostMapping("/return/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void returnBook(@PathVariable String id, @RequestBody Book book){
         libraryService.returnBook(id, book);
