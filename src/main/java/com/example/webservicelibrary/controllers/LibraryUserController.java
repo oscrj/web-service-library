@@ -20,11 +20,12 @@ public class LibraryUserController {
     @Autowired
     private LibraryUserService userService;
 
-    @Secured({"ROLE_ADMIN","ROLE_USER"})
+    @Secured({"ROLE_ADMIN"})
     @GetMapping
-    public ResponseEntity<List<LibraryUser>> findAllLibraryUsers(@RequestParam(required = false) String name) {
+    public ResponseEntity<List<LibraryUser>> findAllLibraryUsers(@RequestParam(required = false) String name,
+                                                                 @RequestParam(required = false) boolean sortOnLastname) {
         // use name to later add functionality to search on user name.
-        return ResponseEntity.ok(userService.findAllUsers());
+        return ResponseEntity.ok(userService.findAllUsers(name, sortOnLastname));
     }
 
     @Secured("ROLE_ADMIN")

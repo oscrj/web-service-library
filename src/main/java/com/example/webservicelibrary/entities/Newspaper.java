@@ -22,6 +22,5 @@ public class Newspaper implements Serializable {
     @NotEmpty(message = "Publisher must contain between 2 - 20 characters.")
     @Size(min = 2, max = 20)
     private String publisher;
-    private LocalDate releaseDate;
     private boolean isAvailable;
 }

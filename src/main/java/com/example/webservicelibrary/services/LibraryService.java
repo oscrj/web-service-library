@@ -1,5 +1,6 @@
 package com.example.webservicelibrary.services;
 
+import com.example.webservicelibrary.entities.Book;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,22 +23,21 @@ public class LibraryService {
         log.warn("Fresh data...");
 
         var books = bookService.findAllBooks(title,sortOnPublishedDate);
-
         List<Object> allObjects = new ArrayList<>();
-
         allObjects.addAll(books);
 
         return allObjects;
     }
+    //@CachePut(value = "libraryCache", key = "#id")
+    public void borrowBook(String id, Book book){
 
-    public void borrowBook(String title){
-
-    }
-
-    public void returnBook(String title){
+        // find the logged in user...
 
     }
 
+    //@CachePut(value = "libraryCache", key = "#id")
+    public void returnBook(String id, Book book){
 
+    }
 
 }

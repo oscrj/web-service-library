@@ -13,7 +13,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -24,11 +26,19 @@ public class LibraryUserService {
     private final PasswordEncoder passwordEncoder;
 
     //@Cacheable(value = "libraryCache")
-    public List<LibraryUser> findAllUsers() {
+    public List<LibraryUser> findAllUsers(String name, boolean sortOnLastname) {
         log.info("Request to find all users.");
-        log.info("Fresh data...");
+        log.info("Fresh User data...");
 
         var users = userRepository.findAll();
+        if (name != null) {
+            users = users.stream()
+                    .filter(user -> user.getFirstname().startsWith(name) || user.getLastname().startsWith(name))
+                    .collect(Collectors.toList());
+        }
+        if (sortOnLastname){
+            users.sort(Comparator.comparing(LibraryUser::getLastname));
+        }
         return users;
     }
 
@@ -54,7 +64,6 @@ public class LibraryUserService {
 
     //@CachePut(value = "libraryCache", key = "#id")
     public void updateUser(String id, LibraryUser user) {
-
         // check if current logged in user is ADMIN.
         var isAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
                 .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().toUpperCase().equals("ROLE_ADMIN"));

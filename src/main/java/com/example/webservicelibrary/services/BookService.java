@@ -23,9 +23,9 @@ public class BookService {
     private final BookRepository bookRepository;
 
     //@Cacheable(value = "libraryCache")
-    public List<Book> findAllBooks(String title, boolean sortOnPublishedDate) {
+    public List<Book> findAllBooks(String title, boolean sortOnPublishedYear) {
         log.info("Request to find all books.");
-        log.info("Fresh data...");
+        log.info("Fresh Book data...");
 
         var books = bookRepository.findAll();
         if (title != null) {
@@ -33,8 +33,8 @@ public class BookService {
                     .filter(book -> book.getTitle().startsWith(title))
                     .collect(Collectors.toList());
         }
-        if (sortOnPublishedDate) {
-            books.sort(Comparator.comparing(Book::getPublishedDate));
+        if (sortOnPublishedYear) {
+            books.sort(Comparator.comparing(Book::getPublishedYear));
         }
         return books;
     }

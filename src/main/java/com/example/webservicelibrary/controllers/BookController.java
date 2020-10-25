@@ -22,8 +22,8 @@ public class BookController {
     @Secured({"ROLE_ADMIN","ROLE_LIBRARIAN"})
     @GetMapping
     public ResponseEntity<List<Book>> findAllBooks(@RequestParam(required = false) String title,
-                                                   @RequestParam(required = false) boolean sort) {
-        return ResponseEntity.ok(bookService.findAllBooks(title,sort));
+                                                   @RequestParam(required = false) boolean sortOnYear) {
+        return ResponseEntity.ok(bookService.findAllBooks(title,sortOnYear));
     }
 
     @Secured({"ROLE_ADMIN","ROLE_LIBRARIAN"})
@@ -51,5 +51,5 @@ public class BookController {
     public void deleteBook(@PathVariable String id) {
         bookService.deleteBook(id);
     }
-    
+
 }
