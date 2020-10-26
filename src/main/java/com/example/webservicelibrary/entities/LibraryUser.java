@@ -39,8 +39,20 @@ public class LibraryUser implements Serializable {
     @Indexed(unique = true)
     @Size(min = 2, max = 10, message = "Username invalid")
     private String username;
+    @Size(min = 2, max = 16, message = "Password must be ")
     @NotBlank(message = "Password must contain a value")
     private String password;
     private List<String> acl;
+    @NotNull
     private List<Book> borrowedBooks = new ArrayList<>();
+
+    /*
+    public boolean addToListOfLoans(Book book) {
+        return borrowedBooks.add(book);
+    }
+
+    public boolean removeFromOfLoans(Book book) {
+        return borrowedBooks.remove(book);
+    }
+    */
 }

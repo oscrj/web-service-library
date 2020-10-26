@@ -245,19 +245,10 @@
         <appender-ref ref="CONSOLE"/>
     </root>
 
-    <logger name="com.example.user" level="info">
+    <logger name="com.example.webservicelibrary" level="info">
         <appender-ref ref="USER_INFO" />
         <appender-ref ref="USER_WARN" />
         <appender-ref ref="USER_ERROR" />
         <appender-ref ref="USER_ERROR_DETAILS" />
     </logger>
-
-    <!--<logger name="com.example.user" level="warn">
-        <appender-ref ref="USER_WARN" />
-    </logger>
-
-    <logger name="com.example.user" level="error">
-        <appender-ref ref="USER_ERROR" />
-        <appender-ref ref="USER_ERROR_DETAILS" />
-    </logger>-->
 </configuration>

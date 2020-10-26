@@ -4,6 +4,7 @@ import com.example.webservicelibrary.entities.LibraryUser;
 import com.example.webservicelibrary.repositories.LibraryUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -19,13 +20,15 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
+//@RequiredArgsConstructor set final
 public class LibraryUserService {
 
-    private final LibraryUserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private LibraryUserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-    //@Cacheable(value = "libraryCache")
+    @Cacheable(value = "libraryCache")
     public List<LibraryUser> findAllUsers(String name, boolean sortOnLastname) {
         log.info("Request to find all users.");
         log.info("Fresh User data...");
@@ -42,7 +45,7 @@ public class LibraryUserService {
         return users;
     }
 
-    //@Cacheable(value = "libraryCache", key = "#id")
+    @Cacheable(value = "libraryCache", key = "#id")
     public LibraryUser findById(String id) {
         if(!userRepository.existsById(id)) log.error(String.format("User with this id %s. , could not be found", id));
         return userRepository.findById(id)
@@ -56,13 +59,13 @@ public class LibraryUserService {
                         String.format("User with this username %s. , could not be found", username)));
     }
 
-    //@CachePut(value = "libraryCache", key = "#result.id")
+    @CachePut(value = "libraryCache", key = "#result.id")
     public LibraryUser saveUser(LibraryUser user) {
         user.setPassword(passwordEncoder.encode(user.getPassword())); // Encrypt users password.
         return userRepository.save(user);
     }
 
-    //@CachePut(value = "libraryCache", key = "#id")
+    @CachePut(value = "libraryCache", key = "#id")
     public void updateUser(String id, LibraryUser user) {
         // check if current logged in user is ADMIN.
         var isAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
@@ -81,12 +84,15 @@ public class LibraryUserService {
                     String.format("User with this id %s. , could not be found", id));
         }
 
+        // Prevent encoding on encoded password.....
+        if (user.getPassword().length() <= 16) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
         user.setId(id);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
 
-    //@CacheEvict(value = "libraryCache", key = "#id")
+    @CacheEvict(value = "libraryCache", key = "#id")
     public void deleteUser(String id) {
         if(!userRepository.existsById(id)) {
             log.error(String.format("User with this id %s. , could not be found", id));

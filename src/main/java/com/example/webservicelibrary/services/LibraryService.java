@@ -2,15 +2,17 @@ package com.example.webservicelibrary.services;
 
 import com.example.webservicelibrary.entities.Book;
 import com.example.webservicelibrary.repositories.BookRepository;
+import com.example.webservicelibrary.repositories.LibraryUserRepository;
+import com.example.webservicelibrary.repositories.MovieRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -20,59 +22,96 @@ import java.util.List;
 public class LibraryService {
 
     private final LibraryUserService userService;
+    private final LibraryUserRepository userRepository;
     private final BookService bookService;
     private final BookRepository bookRepository;
-    private final MovieService movieService;
+    private final MovieRepository movieRepository;
 
-    //@Cacheable(value = "libraryCache")
-    public List<Object> findAll(String title, boolean sortOnPublishedYear, boolean sortOnRating) {
+    @Cacheable(value = "libraryCache")
+    public List<Book> findAll(String title) {
         log.info("Request to find all objects.");
-        log.warn("Fresh data...");
+        log.warn("Fresh Object data...");
 
-        var books = bookService.findAllBooks(title,sortOnPublishedYear);
-        var movies = movieService.findAllMovies(title, sortOnRating);
+        /*
+        var books = bookRepository.findAll() ;
+        var movies = movieRepository.findAll();
         List<Object> allObjects = new ArrayList<>();
         allObjects.addAll(books);
         allObjects.addAll(movies);
-
-        return allObjects;
+        */
+        return bookRepository.findAll();
     }
 
     /**
-     *
-     * @param id
-     * @param book
+     * Adds book to the current logged in users list of borrowed books.
+     * @param id is used to receive the book that will be borrowed and put into the list of borrowed book of the current
+     *           user.
+     * @return the book that was borrowed.
      */
-    //@CachePut(value = "libraryCache", key = "#id")
-    public void borrowBook(String id, Book book){
-
+    @CachePut(value = "libraryCache", key = "#id")
+    public Book borrowBook(String id){
         // find the logged in user...
         var currentUser = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-        if (currentUser == null) {
-            throw new UsernameNotFoundException("You dont have authority to loan");
+        var book = bookService.findBookById(id);
+        log.info(currentUser.getUsername() + " borrowed the book " + book.getTitle());
+
+        if(!userRepository.existsById(currentUser.getId())){
+            log.error(String.format("User with this id %s. , could not be found", id));
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    String.format("User with this id %s. , could not be found", id));
+        }
+        if (!bookRepository.existsById(id)) {
+            log.error(String.format("Could not find book by id %s.", id));
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Could not find book by id %s.", id));
+        }
+        if (!book.isAvailable()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "The book is already rented..");
+        }else {
+            var newList = currentUser.getBorrowedBooks();
+            newList.add(book);
+            currentUser.setBorrowedBooks(newList);
+            book.setAvailable(!book.isAvailable());
+
+            userRepository.save(currentUser);
+            bookRepository.save(book);
+            return book;
+        }
+    }
+
+    /**
+     * Removes the book from the current logged in users list of borrowed books.
+     * @param id is used to receive the book that will be returned and removed from the list of borrowed book of the
+     *           current user.
+     * @return the book that was returned.
+     */
+    @CachePut(value = "libraryCache", key = "#id")
+    public Book returnBook(String id) {
+        var currentUser = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        var book = bookService.findBookById(id);
+        log.info(currentUser.getUsername() + " returned the book " + book.getTitle());
+
+        if (!userRepository.existsById(currentUser.getId())) {
+            log.error(String.format("User with this id %s. , could not be found", id));
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    String.format("User with this id %s. , could not be found", id));
         }
         if (!bookRepository.existsById(id)) {
             log.error(String.format("Could not find book by id %s.", id));
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Could not find book by id %s.", id));
         }
 
+        if (!currentUser.getBorrowedBooks().contains(book)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                    "You have not borrowed this book, and can not return it");
+        }
+
         var newList = currentUser.getBorrowedBooks();
-        newList.add(book);
+        newList.remove(book);
         currentUser.setBorrowedBooks(newList);
-        book.setAvailable(false);
+        book.setAvailable(!book.isAvailable());
 
-        userService.updateUser(currentUser.getId(), currentUser);
-        bookService.updateBook(book.getId(), book);
+        userRepository.save(currentUser);
+        bookRepository.save(book);
+        return book;
     }
-
-    /**
-     *
-     * @param id
-     * @param book
-     */
-    //@CachePut(value = "libraryCache", key = "#id")
-    public void returnBook(String id, Book book){
-
-    }
-
 }
