@@ -1,6 +1,7 @@
 package com.example.webservicelibrary.services;
 
 import com.example.webservicelibrary.entities.Book;
+import com.example.webservicelibrary.entities.Movie;
 import com.example.webservicelibrary.repositories.BookRepository;
 import com.example.webservicelibrary.repositories.LibraryUserRepository;
 import com.example.webservicelibrary.repositories.MovieRepository;
@@ -13,7 +14,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -28,18 +31,67 @@ public class LibraryService {
     private final MovieRepository movieRepository;
 
     @Cacheable(value = "libraryCache")
-    public List<Book> findAll(String title) {
-        log.info("Request to find all objects.");
-        log.warn("Fresh Object data...");
+    public List<Object> findAll() {
+        log.info("Request to find all Items.");
 
-        /*
         var books = bookRepository.findAll() ;
         var movies = movieRepository.findAll();
-        List<Object> allObjects = new ArrayList<>();
-        allObjects.addAll(books);
-        allObjects.addAll(movies);
-        */
-        return bookRepository.findAll();
+        List<Object> allItems = new ArrayList<>();
+        allItems.addAll(books);
+        allItems.addAll(movies);
+
+        return allItems;
+    }
+
+    @Cacheable(value = "libraryCache")
+    public List<Book> findAllAvailableBooks(String title, String author, String genre) {
+        log.info("Request to find all available books.");
+        var books = bookRepository.findAll();
+        books = books.stream()
+                .filter(Book::isAvailable)
+                .collect(Collectors.toList());
+        if (title != null) {
+            books = books.stream()
+                    .filter(book -> book.getTitle().toLowerCase().startsWith(title.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+        if (author != null) {
+            books = books.stream()
+                    .filter(book -> book.getAuthor().toLowerCase().startsWith(author.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+        if (genre != null) {
+            books = books.stream()
+                    .filter(book -> book.getGenre().toLowerCase().startsWith(genre.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+        return books;
+    }
+
+    @Cacheable(value = "libraryCache")
+    public List<Movie> findAllAvailableMovies(String title, String director, String genre) {
+        log.info("Request to find all available movies.");
+        var movies = movieRepository.findAll();
+        movies = movies.stream()
+                .filter(Movie::isAvailable)
+                .collect(Collectors.toList());
+
+        if (title != null) {
+            movies = movies.stream()
+                    .filter(movie -> movie.getTitle().toLowerCase().startsWith(title.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+        if (director != null) {
+            movies = movies.stream()
+                    .filter(movie -> movie.getDirector().toLowerCase().startsWith(director.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+        if (genre != null) {
+            movies = movies.stream()
+                    .filter(movie -> movie.getGenre().toLowerCase().startsWith(genre.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+        return movies;
     }
 
     /**
@@ -50,10 +102,9 @@ public class LibraryService {
      */
     @CachePut(value = "libraryCache", key = "#id")
     public Book borrowBook(String id){
-        // find the logged in user...
-        var currentUser = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        var currentUser = userService.findByUsername(SecurityContextHolder.getContext()
+                .getAuthentication().getName());
         var book = bookService.findBookById(id);
-        log.info(currentUser.getUsername() + " borrowed the book " + book.getTitle());
 
         if(!userRepository.existsById(currentUser.getId())){
             log.error(String.format("User with this id %s. , could not be found", id));
@@ -65,8 +116,10 @@ public class LibraryService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Could not find book by id %s.", id));
         }
         if (!book.isAvailable()) {
+            log.error("User " + currentUser.getUsername() + " try to rent a book that is already borrowed.");
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "The book is already rented..");
         }else {
+            log.info(currentUser.getUsername() + " borrowed the book " + book.getTitle());
             var newList = currentUser.getBorrowedBooks();
             newList.add(book);
             currentUser.setBorrowedBooks(newList);
@@ -86,9 +139,9 @@ public class LibraryService {
      */
     @CachePut(value = "libraryCache", key = "#id")
     public Book returnBook(String id) {
-        var currentUser = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        var currentUser = userService.findByUsername(SecurityContextHolder.getContext()
+                .getAuthentication().getName());
         var book = bookService.findBookById(id);
-        log.info(currentUser.getUsername() + " returned the book " + book.getTitle());
 
         if (!userRepository.existsById(currentUser.getId())) {
             log.error(String.format("User with this id %s. , could not be found", id));
@@ -101,17 +154,18 @@ public class LibraryService {
         }
 
         if (!currentUser.getBorrowedBooks().contains(book)) {
+            log.error("User " + currentUser.getUsername() + " try to return a book user hasn't borrowed");
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
                     "You have not borrowed this book, and can not return it");
+        }else {
+            log.info(currentUser.getUsername() + " returned the book " + book.getTitle());
+            var newList = currentUser.getBorrowedBooks();
+            newList.remove(book);
+            currentUser.setBorrowedBooks(newList);
+            book.setAvailable(!book.isAvailable());
+            userRepository.save(currentUser);
+            bookRepository.save(book);
+            return book;
         }
-
-        var newList = currentUser.getBorrowedBooks();
-        newList.remove(book);
-        currentUser.setBorrowedBooks(newList);
-        book.setAvailable(!book.isAvailable());
-
-        userRepository.save(currentUser);
-        bookRepository.save(book);
-        return book;
     }
 }

@@ -4,7 +4,6 @@ import com.example.webservicelibrary.entities.LibraryUser;
 import com.example.webservicelibrary.repositories.LibraryUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -20,13 +19,11 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-//@RequiredArgsConstructor set final
+@RequiredArgsConstructor
 public class LibraryUserService {
 
-    @Autowired
-    private LibraryUserRepository userRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final LibraryUserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Cacheable(value = "libraryCache")
     public List<LibraryUser> findAllUsers(String name, boolean sortOnLastname) {
@@ -75,6 +72,8 @@ public class LibraryUserService {
                 .equals(user.getUsername().toLowerCase());
 
         if (!isAdmin && !isCurrentUser) {
+            log.error("Logged in user "+ SecurityContextHolder.getContext().getAuthentication().getName()
+                    +" tried to update another user.");
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You can only update your own details.");
         }
 

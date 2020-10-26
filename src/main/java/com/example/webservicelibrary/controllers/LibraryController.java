@@ -1,7 +1,7 @@
 package com.example.webservicelibrary.controllers;
 
 import com.example.webservicelibrary.entities.Book;
-import com.example.webservicelibrary.entities.LibraryUser;
+import com.example.webservicelibrary.entities.Movie;
 import com.example.webservicelibrary.services.LibraryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +19,22 @@ public class LibraryController {
     private LibraryService libraryService;
 
     @GetMapping
-    public ResponseEntity<List<Book>> findAll(@RequestParam(required = false) String title) {
-        return ResponseEntity.ok(libraryService.findAll(title));
+    public ResponseEntity<List<Object>> findAll() {
+        return ResponseEntity.ok(libraryService.findAll());
+    }
+
+    @GetMapping("/books")
+    public ResponseEntity<List<Book>> findAllAvailableBooks(@RequestParam(required = false) String title,
+                                                            @RequestParam(required = false) String author,
+                                                            @RequestParam(required = false) String genre){
+        return ResponseEntity.ok(libraryService.findAllAvailableBooks(title, author, genre));
+    }
+
+    @GetMapping("/movies")
+    public ResponseEntity<List<Movie>> findAllAvailableMovies(@RequestParam(required = false) String title,
+                                                              @RequestParam(required = false) String director,
+                                                              @RequestParam(required = false) String genre) {
+        return ResponseEntity.ok(libraryService.findAllAvailableMovies(title, director, genre));
     }
 
     @Secured({"ROLE_USER","ROLE_LIBRARIAN","ROLE_ADMIN"})

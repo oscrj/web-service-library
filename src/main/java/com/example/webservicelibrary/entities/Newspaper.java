@@ -7,12 +7,12 @@ import org.springframework.data.annotation.Id;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.time.LocalDate;
 
 @Data
 @Builder
 public class Newspaper implements Serializable {
 
+    // not using this entity... repeating code to achieve nothing.
     private static final long serialVersionUID = -3028531895261196552L;
     @Id
     private String id;

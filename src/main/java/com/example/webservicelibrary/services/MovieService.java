@@ -22,7 +22,7 @@ public class MovieService {
 
     private final MovieRepository movieRepository;
 
-    //  @Cacheable(value = "libraryCache")
+    @Cacheable(value = "libraryCache")
     public List<Movie> findAllMovies(String title, boolean sortOnRating) {
         log.info("Request to find all movies.");
         log.info("Fresh Movie data...");
@@ -39,18 +39,18 @@ public class MovieService {
         return movies;
     }
 
-    //  @Cacheable(value = "libraryCache", key = "#id")
+    @Cacheable(value = "libraryCache", key = "#id")
     public Movie findMovieById(String id) {
       return movieRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
               String.format("Could not find the book by id %s.", id)));
     }
 
-    //  @CachePut(value = "libraryCachhe", key = "#result.id")
+    @CachePut(value = "libraryCachhe", key = "#result.id")
     public Movie saveMovie(Movie movie) {
         return movieRepository.save(movie);
     }
 
-    //  @CachePut(value = "libraryCache", key = "#id")
+    @CachePut(value = "libraryCache", key = "#id")
     public void updateMovie(String id, Movie movie) {
         if (!movieRepository.existsById(id)) {
             log.error(String.format("Could not find movie by id %s.", id));
@@ -60,7 +60,7 @@ public class MovieService {
         movieRepository.save(movie);
     }
 
-    //  @CacheEvict(value = "libraryCache", key = "#id")
+    @CacheEvict(value = "libraryCache", key = "#id")
     public void deleteMovie(String id) {
         if (!movieRepository.existsById(id)) {
             log.error(String.format("Could not find movie by id %s.", id));
@@ -68,5 +68,4 @@ public class MovieService {
         }
         movieRepository.deleteById(id);
     }
-
 }

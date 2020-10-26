@@ -1,0 +1,2 @@
+{"@timestamp":"2020-10-26T17:53:12.095+01:00","@version":"1","severity":"ERROR","service":"Library REST API","pid":"2911","thread":"http-nio-7070-exec-2","class":"com.example.webservicelibrary.services.BookService","message":"Could not find book by id 5f95831d65b6b1498c2c0fce. "}
+{"@timestamp":"2020-10-26T17:53:36.769+01:00","@version":"1","severity":"ERROR","service":"Library REST API","pid":"2911","thread":"http-nio-7070-exec-3","class":"com.example.webservicelibrary.services.BookService","message":"Could not find book by id 5f95831d65b6b1498c2c0fce. "}
