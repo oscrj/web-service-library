@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
@@ -25,8 +26,10 @@ public class Movie implements Serializable {
     @NotEmpty(message = "Enter the movies genre")
     private String genre;
     @NotNull
-    private double rating;
+    @Pattern(regexp = "([0-9]).([0-9])", message = "Invalid rating (0.0)")
+    private String rating;
     @NotNull
-    private int publishedYear;
+    @Pattern(regexp = "([0-9]){4}",message = "Entered invalid year (yyyy)")
+    private String publishedYear;
     private boolean isAvailable;
 }

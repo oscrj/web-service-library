@@ -23,7 +23,7 @@ import java.util.List;
 public class FileController {
 
     private static final String currentWorkingDirectory = System.getProperty("user.dir");
-    private static final String uploadDirectory = currentWorkingDirectory + "/src/main/resources/static/uploads/images";
+    private static final String uploadDirectory = currentWorkingDirectory + "/src/main/resources/static/uploads";
     final List<String> supportedFileExtensions = List.of(".png,.jpeg,.jpg,.gif".split(","));
 
     @PostConstruct

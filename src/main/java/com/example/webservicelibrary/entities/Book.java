@@ -24,7 +24,9 @@ public class Book implements Serializable {
     @NotEmpty(message = "Enter the books genre")
     private String genre;
     @NotNull
-    private int publishedYear;
+    @Pattern(regexp = "([0-9]){4}" ,message = "Entered invalid year (yyyy)")
+    private String publishedYear;
+    private String bookCover;
     private boolean isAvailable;
 
 }

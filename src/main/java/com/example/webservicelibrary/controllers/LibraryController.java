@@ -26,26 +26,28 @@ public class LibraryController {
     @GetMapping("/books")
     public ResponseEntity<List<Book>> findAllAvailableBooks(@RequestParam(required = false) String title,
                                                             @RequestParam(required = false) String author,
-                                                            @RequestParam(required = false) String genre){
-        return ResponseEntity.ok(libraryService.findAllAvailableBooks(title, author, genre));
-    }
-
-    @GetMapping("/movies")
-    public ResponseEntity<List<Movie>> findAllAvailableMovies(@RequestParam(required = false) String title,
-                                                              @RequestParam(required = false) String director,
-                                                              @RequestParam(required = false) String genre) {
-        return ResponseEntity.ok(libraryService.findAllAvailableMovies(title, director, genre));
+                                                            @RequestParam(required = false) String genre,
+                                                            @RequestParam(required = false) boolean sortOnGenre){
+        return ResponseEntity.ok(libraryService.findAllAvailableBooks(title, author, genre, sortOnGenre));
     }
 
     @Secured({"ROLE_USER","ROLE_LIBRARIAN","ROLE_ADMIN"})
-    @PutMapping("/borrow/{id}")
+    @PutMapping("/books/borrow/{id}")
     public ResponseEntity<Book> borrowBook(@PathVariable String id) {
         return ResponseEntity.ok(libraryService.borrowBook(id));
     }
 
     @Secured({"ROLE_USER","ROLE_LIBRARIAN","ROLE_ADMIN"})
-    @PutMapping("/return/{id}")
+    @PutMapping("/books/return/{id}")
     public ResponseEntity<Book> returnBook(@PathVariable String id){
         return ResponseEntity.ok(libraryService.returnBook(id));
+    }
+
+    @GetMapping("/movies")
+    public ResponseEntity<List<Movie>> findAllAvailableMovies(@RequestParam(required = false) String title,
+                                                              @RequestParam(required = false) String director,
+                                                              @RequestParam(required = false) String genre,
+                                                              @RequestParam(required = false) boolean sortOnGenre) {
+        return ResponseEntity.ok(libraryService.findAllAvailableMovies(title, director, genre, sortOnGenre));
     }
 }

@@ -45,14 +45,4 @@ public class LibraryUser implements Serializable {
     private List<String> acl;
     @NotNull
     private List<Book> borrowedBooks = new ArrayList<>();
-
-    /*
-    public boolean addToListOfLoans(Book book) {
-        return borrowedBooks.add(book);
-    }
-
-    public boolean removeFromOfLoans(Book book) {
-        return borrowedBooks.remove(book);
-    }
-    */
 }

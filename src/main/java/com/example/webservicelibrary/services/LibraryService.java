@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,7 +45,7 @@ public class LibraryService {
     }
 
     @Cacheable(value = "libraryCache")
-    public List<Book> findAllAvailableBooks(String title, String author, String genre) {
+    public List<Book> findAllAvailableBooks(String title, String author, String genre, boolean sortOnGenre) {
         log.info("Request to find all available books.");
         var books = bookRepository.findAll();
         books = books.stream()
@@ -65,33 +66,10 @@ public class LibraryService {
                     .filter(book -> book.getGenre().toLowerCase().startsWith(genre.toLowerCase()))
                     .collect(Collectors.toList());
         }
+        if (sortOnGenre) {
+            books.sort(Comparator.comparing(Book::getGenre));
+        }
         return books;
-    }
-
-    @Cacheable(value = "libraryCache")
-    public List<Movie> findAllAvailableMovies(String title, String director, String genre) {
-        log.info("Request to find all available movies.");
-        var movies = movieRepository.findAll();
-        movies = movies.stream()
-                .filter(Movie::isAvailable)
-                .collect(Collectors.toList());
-
-        if (title != null) {
-            movies = movies.stream()
-                    .filter(movie -> movie.getTitle().toLowerCase().startsWith(title.toLowerCase()))
-                    .collect(Collectors.toList());
-        }
-        if (director != null) {
-            movies = movies.stream()
-                    .filter(movie -> movie.getDirector().toLowerCase().startsWith(director.toLowerCase()))
-                    .collect(Collectors.toList());
-        }
-        if (genre != null) {
-            movies = movies.stream()
-                    .filter(movie -> movie.getGenre().toLowerCase().startsWith(genre.toLowerCase()))
-                    .collect(Collectors.toList());
-        }
-        return movies;
     }
 
     /**
@@ -167,5 +145,34 @@ public class LibraryService {
             bookRepository.save(book);
             return book;
         }
+    }
+
+    @Cacheable(value = "libraryCache")
+    public List<Movie> findAllAvailableMovies(String title, String director, String genre, boolean sortOnGenre) {
+        log.info("Request to find all available movies.");
+        var movies = movieRepository.findAll();
+        movies = movies.stream()
+                .filter(Movie::isAvailable)
+                .collect(Collectors.toList());
+
+        if (title != null) {
+            movies = movies.stream()
+                    .filter(movie -> movie.getTitle().toLowerCase().startsWith(title.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+        if (director != null) {
+            movies = movies.stream()
+                    .filter(movie -> movie.getDirector().toLowerCase().startsWith(director.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+        if (genre != null) {
+            movies = movies.stream()
+                    .filter(movie -> movie.getGenre().toLowerCase().startsWith(genre.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+        if (sortOnGenre) {
+            movies.sort(Comparator.comparing(Movie::getGenre));
+        }
+        return movies;
     }
 }
