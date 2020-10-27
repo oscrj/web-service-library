@@ -9,7 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -43,6 +45,18 @@ public class BookController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateBook(@PathVariable String id, @RequestBody Book book) {
         bookService.updateBook(id,book);
+    }
+
+    @Secured({"ROLE_ADMIN","ROLE_LIBRARIAN"})
+    @PostMapping("file/{id}")
+    public ResponseEntity<Book> addBookCover(@RequestParam MultipartFile file, @PathVariable String id) throws IOException {
+        var fileExtension = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+        final List<String> supportedFileExtensions = List.of(".png,.jpeg,.jpg,.gif".split(","));
+        if (!supportedFileExtensions.contains(fileExtension.toLowerCase())) {
+            log.error(String.format("Unsupported file extension"));
+            return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).build();
+        }
+        return ResponseEntity.ok(bookService.addBookCover(file,id));
     }
 
     @Secured({"ROLE_ADMIN","ROLE_LIBRARIAN"})

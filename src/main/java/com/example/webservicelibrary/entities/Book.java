@@ -2,6 +2,7 @@ package com.example.webservicelibrary.entities;
 
 import lombok.Builder;
 import lombok.Data;
+import org.bson.types.Binary;
 import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.*;
@@ -26,7 +27,6 @@ public class Book implements Serializable {
     @NotNull
     @Pattern(regexp = "([0-9]){4}" ,message = "Entered invalid year (yyyy)")
     private String publishedYear;
-    private String bookCover;
+    private Binary bookCover;
     private boolean isAvailable;
-
 }

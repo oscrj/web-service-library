@@ -4,13 +4,17 @@ import com.example.webservicelibrary.entities.Book;
 import com.example.webservicelibrary.repositories.BookRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.BsonBinarySubType;
+import org.bson.types.Binary;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -67,5 +71,16 @@ public class BookService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Could not find book by id %s.", id));
         }
         bookRepository.deleteById(id);
+    }
+
+    @CachePut(value = "libraryCache", key = "#id")
+    public Book addBookCover(MultipartFile file, String id) throws IOException {
+        if (!bookRepository.existsById(id)) {
+            log.error(String.format("Could not find book by id %s.", id));
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Could not find book by id %s.", id));
+        }
+        var book = findBookById(id);
+        book.setBookCover(new Binary(BsonBinarySubType.BINARY, file.getBytes()));
+        return bookRepository.save(book);
     }
 }
