@@ -27,8 +27,9 @@ public class LibraryController {
     public ResponseEntity<List<Book>> findAllAvailableBooks(@RequestParam(required = false) String title,
                                                             @RequestParam(required = false) String author,
                                                             @RequestParam(required = false) String genre,
+                                                            @RequestParam(required = false) String publishedYear,
                                                             @RequestParam(required = false) boolean sortOnGenre){
-        return ResponseEntity.ok(libraryService.findAllAvailableBooks(title, author, genre, sortOnGenre));
+        return ResponseEntity.ok(libraryService.findAllAvailableBooks(title, author, genre, publishedYear, sortOnGenre));
     }
 
     @Secured({"ROLE_USER","ROLE_LIBRARIAN","ROLE_ADMIN"})
@@ -47,7 +48,8 @@ public class LibraryController {
     public ResponseEntity<List<Movie>> findAllAvailableMovies(@RequestParam(required = false) String title,
                                                               @RequestParam(required = false) String director,
                                                               @RequestParam(required = false) String genre,
+                                                              @RequestParam(required = false) String publishedYear,
                                                               @RequestParam(required = false) boolean sortOnGenre) {
-        return ResponseEntity.ok(libraryService.findAllAvailableMovies(title, director, genre, sortOnGenre));
+        return ResponseEntity.ok(libraryService.findAllAvailableMovies(title, director, genre, publishedYear, sortOnGenre));
     }
 }

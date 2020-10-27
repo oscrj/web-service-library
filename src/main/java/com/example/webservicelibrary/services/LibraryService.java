@@ -45,7 +45,7 @@ public class LibraryService {
     }
 
     @Cacheable(value = "libraryCache")
-    public List<Book> findAllAvailableBooks(String title, String author, String genre, boolean sortOnGenre) {
+    public List<Book> findAllAvailableBooks(String title, String author, String genre, String publishedYear, boolean sortOnGenre) {
         log.info("Request to find all available books.");
         var books = bookRepository.findAll();
         books = books.stream()
@@ -64,6 +64,11 @@ public class LibraryService {
         if (genre != null) {
             books = books.stream()
                     .filter(book -> book.getGenre().toLowerCase().startsWith(genre.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+        if (publishedYear != null) {
+            books = books.stream()
+                    .filter(book -> book.getPublishedYear().startsWith(publishedYear))
                     .collect(Collectors.toList());
         }
         if (sortOnGenre) {
@@ -148,7 +153,7 @@ public class LibraryService {
     }
 
     @Cacheable(value = "libraryCache")
-    public List<Movie> findAllAvailableMovies(String title, String director, String genre, boolean sortOnGenre) {
+    public List<Movie> findAllAvailableMovies(String title, String director, String genre, String publishedYear, boolean sortOnGenre) {
         log.info("Request to find all available movies.");
         var movies = movieRepository.findAll();
         movies = movies.stream()
@@ -168,6 +173,11 @@ public class LibraryService {
         if (genre != null) {
             movies = movies.stream()
                     .filter(movie -> movie.getGenre().toLowerCase().startsWith(genre.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+        if (publishedYear != null) {
+            movies = movies.stream()
+                    .filter(movie -> movie.getPublishedYear().startsWith(publishedYear))
                     .collect(Collectors.toList());
         }
         if (sortOnGenre) {
