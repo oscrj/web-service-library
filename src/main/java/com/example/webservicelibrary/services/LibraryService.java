@@ -19,7 +19,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -31,19 +30,28 @@ public class LibraryService {
     private final BookRepository bookRepository;
     private final MovieRepository movieRepository;
 
+    /**
+     * @return A list of every item the library contains.
+     * (Everyone can access this list)
+     */
     @Cacheable(value = "libraryCache")
     public List<Object> findAll() {
         log.info("Request to find all Items.");
-
         var books = bookRepository.findAll() ;
         var movies = movieRepository.findAll();
         List<Object> allItems = new ArrayList<>();
         allItems.addAll(books);
         allItems.addAll(movies);
-
         return allItems;
     }
 
+    /**
+     * Show all available books that user can borrow.
+     * @param title author genre publishedYear. params to filter and search in the list with all available books
+     * @param sortOnGenre sort by genre
+     * @return the list of books that matches search.
+     * (Everyone can access this list)
+     */
     @Cacheable(value = "libraryCache")
     public List<Book> findAllAvailableBooks(String title, String author, String genre, String publishedYear, boolean sortOnGenre) {
         log.info("Request to find all available books.");
@@ -88,7 +96,6 @@ public class LibraryService {
         var currentUser = userService.findByUsername(SecurityContextHolder.getContext()
                 .getAuthentication().getName());
         var book = bookService.findBookById(id);
-
         if(!userRepository.existsById(currentUser.getId())){
             log.error(String.format("User with this id %s. , could not be found", id));
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -107,7 +114,6 @@ public class LibraryService {
             newList.add(book);
             currentUser.setBorrowedBooks(newList);
             book.setAvailable(!book.isAvailable());
-
             userRepository.save(currentUser);
             bookRepository.save(book);
             return book;
@@ -125,7 +131,6 @@ public class LibraryService {
         var currentUser = userService.findByUsername(SecurityContextHolder.getContext()
                 .getAuthentication().getName());
         var book = bookService.findBookById(id);
-
         if (!userRepository.existsById(currentUser.getId())) {
             log.error(String.format("User with this id %s. , could not be found", id));
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -135,7 +140,6 @@ public class LibraryService {
             log.error(String.format("Could not find book by id %s.", id));
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Could not find book by id %s.", id));
         }
-
         if (!currentUser.getBorrowedBooks().contains(book)) {
             log.error("User " + currentUser.getUsername() + " try to return a book, that user hasn't borrowed");
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
@@ -152,6 +156,13 @@ public class LibraryService {
         }
     }
 
+    /**
+     * Show all available movies that user can borrow.
+     * @param title director genre publishedYear. params to filter and search in the list with all available movies
+     * @param sortOnGenre sort by genre
+     * @return the list of movies that matches search.
+     * (Everyone can access this list)
+     */
     @Cacheable(value = "libraryCache")
     public List<Movie> findAllAvailableMovies(String title, String director, String genre, String publishedYear, boolean sortOnGenre) {
         log.info("Request to find all available movies.");

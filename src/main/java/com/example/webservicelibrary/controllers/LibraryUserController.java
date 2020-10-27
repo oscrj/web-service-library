@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController //  REST API Endpoints.
+@RestController
 @RequestMapping("/library-api/v1/users")
 @Slf4j
 public class LibraryUserController {
@@ -24,7 +24,6 @@ public class LibraryUserController {
     @GetMapping
     public ResponseEntity<List<LibraryUser>> findAllLibraryUsers(@RequestParam(required = false) String name,
                                                                  @RequestParam(required = false) boolean sortOnLastname) {
-        // use name to later add functionality to search on user name.
         return ResponseEntity.ok(userService.findAllUsers(name, sortOnLastname));
     }
 

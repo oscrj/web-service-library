@@ -70,19 +70,16 @@ public class LibraryUserService {
         // check if logged in user is the user that will be updated.
         var isCurrentUser = SecurityContextHolder.getContext().getAuthentication().getName().toLowerCase()
                 .equals(user.getUsername().toLowerCase());
-
         if (!isAdmin && !isCurrentUser) {
             log.error("Logged in user "+ SecurityContextHolder.getContext().getAuthentication().getName()
                     +" tried to update another user.");
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You can only update your own details.");
         }
-
         if(!userRepository.existsById(id)){
             log.error(String.format("User with this id %s. , could not be found", id));
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     String.format("User with this id %s. , could not be found", id));
         }
-
         // Prevent encoding on encoded password.....
         if (user.getPassword().length() <= 16) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));

@@ -13,7 +13,6 @@ import java.io.Serializable;
 public class Book implements Serializable {
 
     private static final long serialVersionUID = -5550870321107712437L;
-
     @Id
     private String id;
     @NotEmpty(message = "Title must contain between 2 - 64 characters.")

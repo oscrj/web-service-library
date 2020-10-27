@@ -26,7 +26,6 @@ public class MovieService {
     public List<Movie> findAllMovies(String title, boolean sortOnRating) {
         log.info("Request to find all movies.");
         log.info("Fresh Movie data...");
-
         var movies = movieRepository.findAll();
         if (title != null) {
             movies = movies.stream()

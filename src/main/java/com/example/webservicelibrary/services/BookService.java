@@ -64,15 +64,12 @@ public class BookService {
         bookRepository.save(book);
     }
 
-    @CacheEvict(value = "libraryCache", key = "#id")
-    public void deleteBook(String id) {
-        if (!bookRepository.existsById(id)) {
-            log.error(String.format("Could not find book by id %s.", id));
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Could not find book by id %s.", id));
-        }
-        bookRepository.deleteById(id);
-    }
-
+    /**
+     * Add a book cover.
+     * @param file the file that will be the covor of the given book.
+     * @param id the given books id, makes it easier to set the correct cover to the correct book.
+     * @return the book that was updated.
+     */
     @CachePut(value = "libraryCache", key = "#id")
     public Book addBookCover(MultipartFile file, String id) throws IOException {
         if (!bookRepository.existsById(id)) {
@@ -82,5 +79,14 @@ public class BookService {
         var book = findBookById(id);
         book.setBookCover(new Binary(BsonBinarySubType.BINARY, file.getBytes()));
         return bookRepository.save(book);
+    }
+
+    @CacheEvict(value = "libraryCache", key = "#id")
+    public void deleteBook(String id) {
+        if (!bookRepository.existsById(id)) {
+            log.error(String.format("Could not find book by id %s.", id));
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Could not find book by id %s.", id));
+        }
+        bookRepository.deleteById(id);
     }
 }
