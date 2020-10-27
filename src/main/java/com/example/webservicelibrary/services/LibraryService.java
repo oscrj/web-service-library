@@ -137,9 +137,9 @@ public class LibraryService {
         }
 
         if (!currentUser.getBorrowedBooks().contains(book)) {
-            log.error("User " + currentUser.getUsername() + " try to return a book user hasn't borrowed");
+            log.error("User " + currentUser.getUsername() + " try to return a book, that user hasn't borrowed");
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                    "You have not borrowed this book, and can not return it");
+                    "You have not borrowed this book, and there is nothing to return..");
         }else {
             log.info(currentUser.getUsername() + " returned the book " + book.getTitle());
             var newList = currentUser.getBorrowedBooks();
@@ -159,7 +159,6 @@ public class LibraryService {
         movies = movies.stream()
                 .filter(Movie::isAvailable)
                 .collect(Collectors.toList());
-
         if (title != null) {
             movies = movies.stream()
                     .filter(movie -> movie.getTitle().toLowerCase().startsWith(title.toLowerCase()))
