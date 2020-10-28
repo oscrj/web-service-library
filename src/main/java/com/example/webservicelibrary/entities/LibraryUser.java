@@ -1,6 +1,8 @@
 package com.example.webservicelibrary.entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -41,6 +43,8 @@ public class LibraryUser implements Serializable {
     private String username;
     @Size(min = 2, max = 16, message = "Password must be ")
     @NotBlank(message = "Password must contain a value")
+    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
     private List<String> acl;
     @NotNull
